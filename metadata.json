@@ -1,0 +1,6 @@
+{
+  "name": "BazaarBridge",
+  "description": "Multi-dealer e-commerce marketplace with hybrid inventory fulfilment, comparison intelligence, and event-driven architecture powered by Aiven PostgreSQL, Kafka, and OpenSearch.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,1720 @@
+# MASTER DEVELOPMENT PROMPT — BAZAARBRIDGE
+## Production-Quality Full-Stack Multi-Dealer E-Commerce & Hybrid Fulfilment Platform
+
+You are acting as a complete senior software engineering team consisting of:
+
+1. Senior Full-Stack Architect
+2. Senior React Frontend Developer
+3. Senior Node.js and Express Backend Developer
+4. PostgreSQL Database Architect
+5. Kafka Event-Driven Systems Engineer
+6. OpenSearch Engineer
+7. UI/UX Designer
+8. Application Security Engineer
+9. Software QA and Automation Engineer
+
+Your task is to design, develop, integrate, test and deliver a complete, visually impressive, fully functional web application named **BazaarBridge**.
+
+This is a real hackathon project with an established technical implementation plan. You must follow the requirements and technical decisions in this prompt precisely.
+
+Do not create just a landing page, static UI, frontend prototype, or collection of disconnected screens.
+
+Build an integrated full-stack application in which the frontend, backend, database, search engine, event-processing system and administrative simulator work together.
+
+---
+
+# 1. PROJECT OVERVIEW
+
+## Project Name
+BazaarBridge
+
+## Project Vision
+
+BazaarBridge is a multi-dealer e-commerce marketplace that connects customers with multiple local retailers and dealers.
+
+Traditional e-commerce platforms generally display products and prices from a single marketplace listing. BazaarBridge allows customers to compare offers from multiple dealers selling the same product and select the best option according to their requirements.
+
+The platform introduces intelligent dealer comparison and hybrid inventory fulfilment.
+
+A customer should be able to:
+
+- Discover products across multiple categories.
+- Search for products using normal or misspelled queries.
+- Compare multiple dealers offering the same product.
+- Find the best price.
+- Identify the fastest delivery option.
+- Compare dealer ratings.
+- Identify the best-value offer.
+- Check available inventory.
+- Add products to a cart.
+- Reserve inventory temporarily.
+- Place an order.
+- Choose a delivery mode based on PIN-code serviceability.
+- Track fulfilment progress.
+- Verify delivery through an OTP.
+- Cancel eligible orders.
+- View refund information.
+
+### Core differentiator
+
+The most important feature is the ability to compare multiple dealers and fulfil orders through different inventory locations.
+
+Implement three fulfilment modes:
+
+**Quick Delivery**
+- Stock available at a nearby fulfilment hub.
+- Subject to PIN-code serviceability, hub operating hours, eligible delivery modes and capacity.
+- Show an estimated delivery time range.
+
+**Standard Delivery**
+- Stock available at the Bangalore warehouse.
+- Standard fulfilment process.
+- Show an estimated delivery range.
+
+**Transfer Delivery**
+- Product currently available at another stock location, such as Mysuru.
+- Stock must be transferred through the defined transfer workflow.
+- Show the estimated transfer and delivery time range.
+
+The application must support mixed carts where different items in one parent order can belong to different fulfilment groups.
+
+The three fulfilment modes must remain independently trackable.
+
+---
+
+# 2. NON-NEGOTIABLE TECHNOLOGY STACK
+
+Use the following exact architecture.
+
+## Frontend
+
+- React
+- Vite
+- Tailwind CSS
+- React Router
+- Axios or a properly configured Fetch API wrapper
+- Lucide React icons
+- Reusable React components
+- Responsive design
+
+Use JavaScript or TypeScript consistently. Prefer TypeScript for maintainability if introducing it does not break an existing JavaScript project.
+
+## Backend
+
+- Node.js
+- Express.js
+- REST API architecture
+- JWT authentication
+- bcrypt password hashing
+- PostgreSQL driver / node-postgres
+- KafkaJS for Kafka integration
+- OpenSearch JavaScript client
+- Proper validation and error-handling middleware
+
+## Database
+
+Aiven PostgreSQL.
+
+PostgreSQL must be the authoritative source of truth for:
+- Users
+- Products
+- Dealers
+- Dealer offers
+- Inventory
+- Reservations
+- Carts
+- Orders
+- Order items
+- Fulfilment groups
+- Stock transfers
+- Notifications
+- Refunds
+- Price history
+- Event processing records
+
+## Event Streaming
+
+Aiven Kafka.
+
+Use exactly these two application topics:
+
+1. bazaar.core.events
+2. bazaar.fulfilment.events
+
+Each topic should use two partitions, subject to verification of the actual Aiven service limits.
+
+## Search
+
+Aiven OpenSearch.
+
+Use it for:
+- Fuzzy product discovery
+- Typo-tolerant search
+- Dealer offer discovery
+- Category filtering
+- Price filtering
+- City filtering
+
+PostgreSQL must revalidate all returned search candidates before showing final results.
+
+## AI Integration
+
+Gemini API is OPTIONAL.
+
+Implement the shopping assistant only after the mandatory application functionality is working.
+
+The Gemini API key must remain on the backend in environment variables. Never expose it in the browser.
+
+Do not introduce any other database, cache, queue or search engine.
+
+Do not silently substitute Firebase, Supabase, MongoDB, Firestore, Redis, Elasticsearch or any other service for the specified architecture.
+
+---
+
+# 3. APPLICATION ARCHITECTURE
+
+Build a clean monorepo structure.
+
+Recommended structure:
+
+bazaarbridge/
+|
+|-- frontend/
+|   |-- src/
+|   |   |-- assets/
+|   |   |-- components/
+|   |   |-- layouts/
+|   |   |-- pages/
+|   |   |-- hooks/
+|   |   |-- context/
+|   |   |-- services/
+|   |   |-- utils/
+|   |   |-- kit/
+|   |   |-- simulated/
+|   |   |-- App.jsx
+|   |   |-- main.jsx
+|   |-- public/
+|   |-- package.json
+|   |-- vite.config.js
+|
+|-- backend/
+|   |-- src/
+|   |   |-- api/
+|   |   |-- db/
+|   |   |-- events/
+|   |   |-- search/
+|   |   |-- seed/
+|   |   |-- middleware/
+|   |   |-- utils/
+|   |   |-- tests/
+|   |   |-- config/
+|   |   |-- app.js
+|   |   |-- server.js
+|   |-- package.json
+|
+|-- docs/
+|-- scripts/
+|-- .env.example
+|-- .gitignore
+|-- README.md
+
+Keep the application modular.
+
+All Express API routes must be inside backend/src/api/.
+
+Keep event producers, consumers and event-processing services inside backend/src/events/.
+
+Keep OpenSearch services inside backend/src/search/.
+
+Keep seed scripts and test suites in their designated directories.
+
+Do not mix frontend business logic with backend database operations.
+
+Do not place database credentials in frontend code.
+
+---
+
+# 4. FRONTEND DESIGN — EXTREMELY IMPORTANT
+
+The frontend must look like a professionally designed, modern e-commerce technology platform.
+
+I want a premium, polished, enterprise-grade design, not a generic AI-generated template.
+
+## Overall visual direction
+
+Design inspiration:
+
+- Modern premium e-commerce websites.
+- Professional marketplace dashboards.
+- High-quality SaaS interfaces.
+- Modern fintech-level visual consistency.
+- Clean editorial product presentation.
+
+Use a sophisticated light theme as the default storefront experience.
+
+Suggested design palette:
+
+- Primary background: #F8FAFC
+- Secondary background: #FFFFFF
+- Primary text: #111827
+- Secondary text: #64748B
+- Primary brand colour: #4F46E5
+- Accent colour: #F59E0B
+- Success: #16A34A
+- Error: #DC2626
+- Border: #E2E8F0
+
+Use consistent typography such as Inter.
+
+### Design principles
+
+1. Generous whitespace.
+2. Beautiful typography.
+3. Consistent spacing.
+4. Clean alignment.
+5. Premium product cards.
+6. Subtle shadows.
+7. Rounded corners without excessive rounding.
+8. Carefully selected icons.
+9. Smooth micro-interactions.
+10. Responsive layouts.
+11. Accessible colour contrast.
+12. Professional empty states.
+13. Beautiful loading skeletons.
+14. Consistent button styles.
+15. Clear visual hierarchy.
+
+Avoid:
+- Excessive gradients.
+- Random colours.
+- Excessive glassmorphism.
+- Overcrowded cards.
+- Oversized text.
+- Unnecessary animations.
+- Generic AI dashboard aesthetics.
+- Emojis as replacements for professional icons.
+- Placeholder buttons that do nothing.
+
+Use Framer Motion only where it improves the experience.
+
+Animations must remain subtle and performant.
+
+## Main navigation
+
+Create a responsive navigation system.
+
+Desktop navigation:
+
+- BazaarBridge logo
+- Home
+- Categories
+- Compare Deals
+- Outside Bangalore
+- Search bar
+- Wishlist (if enabled)
+- Notifications
+- Cart
+- User profile
+
+Mobile navigation should use a clean, usable menu and properly sized touch targets.
+
+Include a professional footer containing:
+- About BazaarBridge
+- How it works
+- Customer support
+- Privacy policy
+- Terms and conditions
+- Contact information
+
+---
+
+# 5. CUSTOMER-FACING PAGES
+
+Build the following pages as real application pages.
+
+## A. Home Page
+
+Create an attractive marketplace homepage.
+
+Sections:
+
+1. Hero section with a strong headline:
+   "Better Deals. Smarter Choices. Delivered Locally."
+
+2. Supporting description explaining multi-dealer comparison.
+
+3. Prominent search bar.
+
+4. Browse by category.
+
+5. Featured products.
+
+6. Best price offers.
+
+7. Top-rated dealers.
+
+8. Fast delivery section.
+
+9. How BazaarBridge works.
+
+10. Outside Bangalore discovery section.
+
+11. Platform benefits.
+
+12. Professional footer.
+
+All product data must come from the backend.
+
+Never hardcode product cards in production components.
+
+Use properly licensed remote product imagery or local assets with graceful fallbacks.
+
+## B. Product Listing Page
+
+Features:
+
+- Product grid.
+- Search results.
+- Category selection.
+- City selection.
+- Maximum price filter.
+- Quick delivery availability filter.
+- Sorting.
+- Product availability.
+- Dealer count.
+- Product ratings where available.
+- Pagination or controlled result loading.
+
+The filter system must communicate with the backend.
+
+When multiple filters are selected, all applicable filters must work together.
+
+## C. Product Detail Page
+
+Display:
+
+- Product image gallery.
+- Product name.
+- Brand.
+- Description.
+- Technical specifications.
+- Category.
+- Available dealer count.
+- Price information.
+- Price history.
+- Related products.
+- Dealer comparison entry point.
+
+The product detail page must provide a clear action:
+
+"Compare Dealer Offers"
+
+## D. Dealer Comparison Page
+
+This is one of the most important pages in BazaarBridge.
+
+Display five comparison categories:
+
+1. Best Budget
+2. Fastest Delivery
+3. Best Rated Dealer
+4. Best Value
+5. Most Available
+
+Each category must display the actual winning dealer offer returned by the backend.
+
+Every offer card should show:
+
+- Dealer/shop name.
+- Product name.
+- Selling price.
+- Estimated delivery days.
+- Dealer rating.
+- Number of reviews.
+- Available inventory.
+- Delivery information.
+- Warranty information where available.
+- A clear reason explaining why the offer won.
+- Add to cart button.
+
+The reason must be taken verbatim from the backend API.
+
+Never invent comparison reasons in the frontend.
+
+### Comparison algorithms
+
+Follow these rules:
+
+Best Budget:
+- Lowest selling price.
+- Tie-break: delivery time, then rating.
+
+Fastest Delivery:
+- Lowest effective delivery days.
+- Tie-break: price.
+
+Best Rated Dealer:
+- Highest dealer rating.
+- Tie-break: review count, then price.
+
+Best Value:
+Use the weighted scoring system:
+
+- Price: 45%
+- Delivery: 25%
+- Rating: 20%
+- Stock: 10%
+
+Most Available:
+- Highest sellable free inventory.
+- Tie-break: selling price.
+
+Only active offers with positive sellable free inventory qualify.
+
+Never count quarantine stock or unavailable stock.
+
+Do not calculate these rankings independently in React.
+
+The backend must implement the ranking rules.
+
+## E. Cart Page
+
+Build a fully functional cart.
+
+Features:
+
+- Product thumbnail.
+- Product information.
+- Selected dealer.
+- Price.
+- Quantity controls.
+- Remove item.
+- Save for later, only if enabled.
+- Inventory availability.
+- Reservation countdown.
+- Cart subtotal.
+- Delivery fee information when available.
+- Order summary.
+
+Use backend APIs for all important operations.
+
+Reservations should expire after the specified 10-minute period.
+
+Removing an item must release its attached reservation exactly once.
+
+## F. Checkout Page
+
+Create a multi-step checkout experience.
+
+Steps:
+
+1. Review cart.
+2. Enter delivery PIN code.
+3. Verify serviceability.
+4. Select delivery mode for eligible groups.
+5. Display applicable delivery fees.
+6. Display ETA ranges.
+7. Review total.
+8. Place order.
+
+Quick delivery should only appear when the backend confirms it is available.
+
+Allow customers to downgrade an eligible Quick hub line to Standard.
+
+Never calculate delivery fees or delivery promises in the frontend.
+
+Show the per-group delivery fee and ETA returned by the backend.
+
+Handle all backend error responses gracefully:
+
+- OUT_OF_STOCK
+- PRICE_CHANGED
+- RESERVATION_EXPIRED
+- QUICK_NOT_AVAILABLE
+- LOCATION_NOT_SELLABLE
+
+For PRICE_CHANGED:
+
+1. Display the updated price.
+2. Release the old reservation.
+3. Reserve the item again.
+4. Retry order placement.
+
+Never create a second reservation without releasing the previous hold.
+
+## G. Order Tracking Page
+
+Build a premium order-tracking interface.
+
+Display:
+
+- Order ID.
+- Order date.
+- Items.
+- Payment simulation status.
+- Total amount.
+- Fulfilment groups.
+- Delivery modes.
+- ETA ranges.
+- Delivery status.
+- Shipment timeline.
+- Cancellation eligibility.
+- Notifications.
+- SAMPLE DEMO OTP for the owning customer only, while undelivered.
+
+Poll the backend for order updates.
+
+Different fulfilment groups must have independent tracking timelines.
+
+For transfer orders, show the transfer steps separately:
+
+- Transfer requested.
+- In transit.
+- Received and QC checked.
+- Allocated to order.
+
+Cancellation must be available only when allowed by the backend.
+
+If the backend responds with ALREADY_CANCELLED_OR_TOO_LATE, display a clear explanation.
+
+## H. Outside Bangalore Page
+
+Build a dedicated page showing two separate sections:
+
+Section A:
+"In Bangalore Stock – Faster Delivery"
+
+Section B:
+"Moved From Another Stock Location – Approximately 2–3 Days"
+
+Use GET /api/outside-bangalore.
+
+For Section B, display the original holding city and estimated transfer duration.
+
+Both sections must show meaningful empty states when no products are available.
+
+---
+
+# 6. AUTHENTICATION AND USER ROLES
+
+Implement proper authentication.
+
+Customer features:
+
+- Login.
+- Registration if supported by the existing API.
+- JWT-based authentication.
+- Profile information.
+- Logout.
+- Protected routes.
+- Session persistence.
+
+Admin features:
+
+- Separate /admin-login page.
+- Admin-only protected routes.
+- No prefilled admin password.
+- Role-based authorization.
+
+The backend must verify JWTs and derive the current user identity from the verified token.
+
+Never trust user_id supplied in a request body.
+
+Password storage must use bcrypt hashes.
+
+Rate-limit login attempts.
+
+Only the customer demo login may be prefilled with clearly labelled SAMPLE credentials.
+
+---
+
+# 7. ADMIN DASHBOARD AND SIMULATOR
+
+Build a separate administrative interface.
+
+This is important for the hackathon demonstration.
+
+The admin dashboard must provide:
+
+## Dashboard overview
+
+- Total products.
+- Total dealers.
+- Orders.
+- Active fulfilment groups.
+- Pending transfers.
+- Refund cases.
+- Inventory summary.
+
+Only show metrics that are supported by real database queries.
+
+## Simulator console
+
+Implement functional simulator controls:
+
+For fulfilment:
+
+- Mark Picked.
+- Mark Packed.
+- Assign Rider.
+- Picked Up.
+- Out for Delivery.
+- Deliver – Correct OTP.
+- Deliver – Wrong OTP.
+- Delivery Exception.
+
+For transfers:
+
+- Mark In Transit.
+- Mark Received and QC'd.
+- Allocate to Order.
+
+These must be three distinct transitions.
+
+For after-sales:
+
+- Credit Refund (Simulated).
+
+For hub management:
+
+- Activate Hub.
+- Pause Hub.
+
+For observability:
+
+- Live Proof Panel.
+
+The live-proof panel should show:
+- Outbox events.
+- Processed event records.
+- OpenSearch indexed revision.
+- Event processing outcomes.
+- OTP proofs as hashes only.
+
+Never expose raw OTP values in the live-proof panel.
+
+Do not implement simulator buttons as frontend-only state changes.
+
+Every simulator action must call its actual backend endpoint.
+
+---
+
+# 8. BACKEND API IMPLEMENTATION
+
+Implement the API contract described below.
+
+All routes except login must require authentication where specified.
+
+Use consistent responses.
+
+Error format:
+
+{
+  "error": "ERROR_CODE",
+  "message": "Human-readable explanation"
+}
+
+## Authentication
+
+POST /api/auth/login
+
+## Products and search
+
+GET /api/products?category=
+
+GET /api/search?q=&category=&max_price=&city=&quick=
+
+GET /api/search/filters
+
+GET /api/products/:id
+
+GET /api/products/:id/offers?category=
+
+GET /api/products/:id/price-history
+
+GET /api/products/:id/related
+
+GET /api/products/compare?ids=
+
+GET /api/outside-bangalore
+
+## Cart and reservations
+
+POST /api/cart/items
+
+GET /api/cart
+
+DELETE /api/cart/items/:cartItemId
+
+POST /api/cart/reserve
+
+POST /api/cart/release
+
+## Orders and checkout
+
+POST /api/orders
+
+GET /api/orders/:id
+
+POST /api/check-pin
+
+## Cancellation
+
+POST /api/orders/:id/items/:orderItemId/cancel
+
+## Simulator
+
+POST /api/simulator/fire-event
+
+## Admin
+
+GET /api/admin/groups/:id/demo-otp
+
+POST /api/admin/refunds/:id/credit
+
+POST /api/admin/hubs/:id/status
+
+GET /api/admin/live-proof
+
+## Notifications
+
+GET /api/notifications?unread=true
+
+## Optional APIs
+
+POST /api/wishlist/toggle
+
+GET /api/wishlist
+
+GET /api/recently-viewed
+
+POST /api/coupons/validate
+
+POST /api/alerts/subscribe
+
+POST /api/shopping-assistant
+
+Implement optional endpoints only when the corresponding feature flags are enabled.
+
+Do not leave implemented UI components calling nonexistent APIs.
+
+---
+
+# 9. DATABASE ENGINEERING
+
+Use Aiven PostgreSQL as the only system of record.
+
+Implement the database schema from the approved BazaarBridge v7.2 plan.
+
+Important entities include:
+
+- users
+- categories
+- products
+- dealers
+- dealer_offers
+- stock_locations
+- inventory
+- reservations
+- carts
+- cart_items
+- orders
+- order_items
+- offer_price_history
+- outbox_events
+- processed_events
+- offer_state_versions
+- payments
+- refunds
+- after_sales_cases
+- fulfilment_hubs
+- hub_service_areas
+- fulfilment_groups
+- stock_transfers
+- shipment_timeline
+- notifications
+
+Preserve all relationships, constraints, unique indexes, foreign keys and required triggers from the approved schema.
+
+Use database migrations or the approved schema deployment process.
+
+Do not create duplicate or conflicting database schemas.
+
+### Critical database rules
+
+1. Money must use BIGINT paise.
+2. JSON responses must carry integer paise.
+3. Never use floating-point arithmetic for money.
+4. Reservations must have correct state transitions.
+5. Inventory must be updated atomically.
+6. Check affected row counts for guarded stock updates.
+7. Never use unsafe read-then-write inventory operations.
+8. Maintain accurate reservation quantities.
+9. Preserve price history.
+10. Keep order and refund totals reconciled.
+
+For stock changes involving multiple rows, use consistent lock ordering:
+
+ORDER BY offer_id, location_id.
+
+Retry PostgreSQL deadlock errors (40P01) up to three times with jitter.
+
+### Reservation state machine
+
+reserved -> confirmed
+
+reserved -> expired
+
+reserved -> released
+
+confirmed -> released only during eligible pre-finalisation cancellation.
+
+A confirmed reservation cannot be released through the ordinary cart-release endpoint.
+
+Return 409 CANNOT_RELEASE_CONFIRMED.
+
+Once stock_finalised becomes true, the reservation must not be released through the cart-release mechanism.
+
+---
+
+# 10. KAFKA EVENT-DRIVEN ARCHITECTURE
+
+Kafka must perform actual event streaming.
+
+Do not simulate Kafka using local arrays, browser state or console messages.
+
+Use the transactional outbox pattern.
+
+Required workflow:
+
+Simulator/API action
+→ PostgreSQL transaction
+→ Outbox event
+→ Kafka producer
+→ Kafka topic
+→ Idempotent consumer
+→ PostgreSQL updates
+→ Notification/timeline
+→ Frontend polling
+
+Use these topics:
+
+bazaar.core.events
+
+bazaar.fulfilment.events
+
+Use key-based partitioning.
+
+Important event types:
+
+Core events:
+- order-placed
+- inventory-updated
+- order-item-cancelled
+- offer-price-updated
+- refund-credit-requested
+- notification-created
+
+Fulfilment events:
+- fulfilment-status-updated
+- stock-transfer-status-updated
+- eta-updated
+
+Use the aggregate key defined in the implementation plan.
+
+Use processed_events with the composite primary key:
+
+(event_id, consumer_name)
+
+Every consumer must be idempotent.
+
+Replayed events must not:
+- Deduct inventory twice.
+- Release inventory twice.
+- Create duplicate notifications.
+- Create duplicate timeline records.
+- Credit refunds twice.
+
+Never mark an event as processed before its business operation succeeds.
+
+For PostgreSQL-only consumers, business changes, processed-event markers and required outbox writes must occur in one transaction.
+
+For consumers writing to OpenSearch, do not place OpenSearch calls inside a PostgreSQL transaction.
+
+---
+
+# 11. OPENSEARCH INTEGRATION
+
+Create and maintain an offers index.
+
+Use fuzzy matching so queries such as:
+
+"bluetoth"
+
+can discover:
+
+"Bluetooth"
+
+The search service must return candidate offer IDs.
+
+PostgreSQL must re-read authoritative product, offer, dealer, price and inventory information.
+
+Reapply all requested filters after the PostgreSQL recheck.
+
+This is essential because indexed data can be stale.
+
+Use revision-based indexing.
+
+Implement:
+
+- ensureIndex()
+- searchOffers()
+- upsertOffer()
+
+Use external versioning with:
+
+version_type=external_gte
+
+A 409 version conflict means a newer version already exists and should be treated as a successful stale-write rejection.
+
+Never index:
+
+- Raw OTP codes.
+- OTP proofs.
+- Passwords.
+- Phone numbers.
+- Addresses.
+- Secrets.
+- Quick availability.
+
+Quick eligibility must be computed using current PostgreSQL data, not stale OpenSearch documents.
+
+---
+
+# 12. HYBRID FULFILMENT BUSINESS LOGIC
+
+This is a central part of the application.
+
+Follow the approved fulfilment rules.
+
+## PIN-code validation
+
+Resolve the active hub through the PIN-code mapping.
+
+A PIN code must not be treated as serviceable simply because it is entered.
+
+Check:
+
+- Whether a matching active hub exists.
+- Whether the stock is physically at that hub.
+- Whether the hub is within operating hours.
+- Whether daily capacity remains.
+- Whether the offer permits Quick delivery.
+
+## Delivery grouping
+
+Group order items using:
+
+(location_id, mode)
+
+One parent order may contain multiple independently tracked fulfilment groups.
+
+## Sample delivery fee constants
+
+Use the implementation-plan values in backend configuration:
+
+FEE_QUICK_PAISE = 4900
+
+FEE_STANDARD_PAISE = 2900
+
+FEE_TRANSFER_PAISE = 6900
+
+FREE_STANDARD_THRESHOLD_PAISE = 99900
+
+Rules:
+
+- Quick: ₹49.
+- Standard: ₹29 unless the group's eligible items total reaches ₹999.
+- Transfer: ₹69.
+
+These are SAMPLE configuration values, not claims of live commercial pricing.
+
+The backend calculates all fees.
+
+## ETA
+
+Use the specified backend ETA calculation.
+
+Quick:
+- Acceptance time.
+- Picking queue.
+- Packing.
+- Rider assignment.
+- Travel estimate.
+- Display a range with ±15 minutes.
+
+Standard:
+- Warehouse processing plus local delivery estimate.
+
+Transfer:
+- Transfer duration plus warehouse and local delivery estimate.
+
+Store the calculated ETA range and its basis in PostgreSQL.
+
+Never display a fixed delivery promise created by the frontend.
+
+---
+
+# 13. OTP SECURITY
+
+Implement the exact proof-based OTP approach.
+
+Every fulfilment group must receive an OTP hash, irrespective of mode.
+
+The raw OTP must never be placed in:
+- Kafka messages.
+- Outbox payloads.
+- Logs.
+- OpenSearch documents.
+- Live-proof responses.
+
+For otp_verified:
+
+The admin submits the OTP in the request body.
+
+The backend computes:
+
+otp_proof = HMAC_SHA256(OTP_HASH_SECRET, "hash:" + submitted_code)
+
+Only the proof is written into the outbox payload.
+
+The consumer performs a constant-time comparison against the stored otp_hash.
+
+Correct proof:
+- Deliver the order.
+
+Incorrect proof:
+- Add an otp_failed timeline record.
+- Do not deliver.
+
+All three fulfilment modes must enforce OTP verification.
+
+The customer's own SAMPLE DEMO OTP may be displayed only through the authorised order response while the group remains undelivered.
+
+The admin demo OTP endpoint is admin-only.
+
+Never log request bodies containing OTP values.
+
+---
+
+# 14. CANCELLATION AND REFUNDS
+
+Cancellation, stock restoration and refund ledger accounting must be real backend functionality.
+
+Payment gateway money movement is a SIMULATED stub.
+
+Implement:
+
+- Cancellation request.
+- Request idempotency.
+- Conditional cancellation transition.
+- Reservation release when stock is not finalised.
+- Stock restoration when stock has already been deducted.
+- Correct transfer restoration.
+- Refund record creation.
+- Refund credit processing.
+- Notification creation.
+
+Cancellation and inventory finalisation must be serialized using conditional updates on the same order_items row.
+
+A stock movement must only occur when the corresponding conditional state transition succeeds.
+
+### Refund processing
+
+The refund consumer is the only component that credits refund ledger amounts.
+
+Implement:
+- Conditional refund status update.
+- Atomic capped refund update.
+- Duplicate credit protection.
+- Refund amount validation.
+- Idempotent event handling.
+
+The admin endpoint only enqueues a refund-credit event.
+
+It must not directly move money.
+
+Clearly label the gateway and credit simulation as SIMULATED.
+
+---
+
+# 15. SEED DATA AND DEMO EXPERIENCE
+
+Create a repeatable seed script.
+
+The approved plan requires:
+
+- 40 products.
+- 5 categories.
+- 5 Bangalore dealers.
+- Multiple offers for popular products.
+- One product with exactly one inventory unit for concurrency testing.
+- Bangalore warehouse.
+- One fulfilment hub.
+- Three sample PIN codes.
+- Quarantine location.
+- Mysuru holding location.
+- A transfer offer with no initial Bangalore inventory row.
+- Demo customer and admin accounts.
+
+### Comparison demonstration product
+
+Create one Bluetooth speaker with five different dealer offers.
+
+Use the approved values:
+
+- ₹699 / 4 days / rating 3.9 / 12 reviews.
+- ₹779 / 1 day / rating 4.3 / 6 reviews.
+- ₹749 / 2 days / rating 4.8 / 3 reviews.
+- ₹725 / 2 days / rating 4.4 / 9 reviews.
+- ₹769 / 3 days / rating 4.1 / 40 available units.
+
+All five must be stocked in the Bangalore warehouse.
+
+Give the other four between 5 and 20 free units.
+
+Expected comparison winners:
+
+- Best Budget: ₹699.
+- Fastest: ₹779.
+- Best Rated: ₹749.
+- Best Value: ₹725.
+- Most Available: ₹769.
+
+Every comparison tab must return a different offer.
+
+All seeded products, reviews, hubs, riders, price history, fees and demo OTPs must be visibly labelled SAMPLE or SIMULATED where appropriate.
+
+Do not claim that sample inventory represents live retailer stock.
+
+---
+
+# 16. OPTIONAL FEATURES — BUILD ONLY AFTER THE CORE
+
+Optional features must be controlled through feature flags.
+
+Examples:
+
+FEATURE_ASSISTANT
+
+FEATURE_COUPONS
+
+FEATURE_ADDRESSES
+
+FEATURE_WISHLIST
+
+FEATURE_SAVE_LATER
+
+FEATURE_COMPARE
+
+FEATURE_ALERTS
+
+FEATURE_SIM_SCREENS
+
+Do not allow optional features to break the mandatory core.
+
+### Gemini Shopping Assistant
+
+If enabled, it must translate a customer message into one validated filter object.
+
+It must never invent:
+- Products.
+- Prices.
+- Dealer ratings.
+- Inventory.
+- Delivery estimates.
+
+Use Gemini structured output with a fixed JSON schema.
+
+Send only the customer's message, not the full product catalogue.
+
+Validate the returned filters before using them.
+
+PostgreSQL remains the source of truth.
+
+On timeout or invalid JSON, retry once and fall back to ordinary search with a clear fallback indicator.
+
+This must be a shopping filter assistant, not an unrestricted chatbot.
+
+---
+
+# 17. SECURITY AND ENVIRONMENT CONFIGURATION
+
+Create a complete .env.example.
+
+Include placeholders for:
+
+PG_URI=
+
+KAFKA_BROKERS=
+
+KAFKA_SECURITY_PROTOCOL=SASL_SSL
+
+KAFKA_SASL_MECHANISM=SCRAM-SHA-256
+
+KAFKA_SASL_USERNAME=
+
+KAFKA_SASL_PASSWORD=
+
+KAFKA_CA_PATH=
+
+OPENSEARCH_URL=
+
+OPENSEARCH_USERNAME=
+
+OPENSEARCH_PASSWORD=
+
+JWT_SECRET=
+
+OTP_HASH_SECRET=
+
+SEED_ADMIN_PASSWORD=
+
+GEMINI_API_KEY=
+
+FRONTEND_URL=
+
+PORT=
+
+Never create fake production credentials.
+
+Never commit .env.
+
+Add these patterns to .gitignore:
+
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+certs/
+secrets/
+node_modules/
+dist/
+
+Implement:
+- JWT validation.
+- Role-based access control.
+- Login rate limiting.
+- Request validation.
+- CORS configuration.
+- Secure error handling.
+- Environment validation.
+- SQL parameterization.
+- Secret scanning.
+
+Never expose secrets through frontend environment variables or client bundles.
+
+---
+
+# 18. TESTING AND QUALITY ASSURANCE
+
+Do not declare the application complete merely because it runs.
+
+Create and run backend integration tests.
+
+Mandatory test cases:
+
+1. Customer authentication.
+2. Admin authorization.
+3. Typo-tolerant search.
+4. Search category filter.
+5. Search maximum-price filter.
+6. Search city filter.
+7. Combined search filters.
+8. Five distinct comparison winners.
+9. Atomic inventory reservation.
+10. Out-of-stock concurrency.
+11. Reservation expiry.
+12. Idempotent reservation release.
+13. PRICE_CHANGED handling.
+14. PRICE_CHANGED retry after release.
+15. Order creation.
+16. Order total reconciliation.
+17. Inventory finalisation.
+18. Event replay idempotency.
+19. Finalizer guard.
+20. Finalizer deadlock handling.
+21. Quick and Standard fulfilment.
+22. Mixed-cart fulfilment groups.
+23. Delivery fee allocation.
+24. ETA ranges.
+25. Wrong OTP rejection.
+26. Correct OTP delivery.
+27. OTP privacy.
+28. Cancellation before finalisation.
+29. Cancellation after finalisation.
+30. Cancellation/finalisation race.
+31. Refund double-credit protection.
+32. Refund cap protection.
+33. Transfer flow.
+34. Transfer cancellation race.
+35. Restock when Bangalore inventory row does not exist.
+36. Hub pause and Quick availability.
+
+Test the real Aiven PostgreSQL, Kafka and OpenSearch integrations.
+
+Do not replace integration tests with mocked tests and then claim the real infrastructure works.
+
+Run frontend build checks and verify all routes.
+
+Test all major user journeys from login to checkout to tracking.
+
+If any integration fails, investigate and fix the root cause.
+
+Do not hide failed tests or falsely report success.
+
+---
+
+# 19. ERROR HANDLING AND USER EXPERIENCE
+
+Every page must have:
+
+- Loading state.
+- Empty state.
+- Error state.
+- Retry action where appropriate.
+- Form validation.
+- Success feedback.
+- Responsive behaviour.
+
+Handle API failures gracefully.
+
+Never show a blank page when the backend is unavailable.
+
+Use clear messages understandable to ordinary customers.
+
+Examples:
+
+"Sorry, this offer is no longer available."
+
+"The price has changed. Please review the updated amount."
+
+"Quick delivery is currently unavailable for this PIN code."
+
+"Your reservation has expired. Please reserve the item again."
+
+"Your order has been placed successfully."
+
+Use toast notifications where appropriate.
+
+---
+
+# 20. PERFORMANCE AND CODE QUALITY
+
+Requirements:
+
+- Reusable React components.
+- Lazy-loaded routes.
+- Efficient API calls.
+- Debounced search.
+- Proper pagination.
+- Optimized product imagery.
+- Database indexes.
+- Connection pooling.
+- Efficient Kafka consumers.
+- No unnecessary re-renders.
+- No duplicated business logic.
+- No hardcoded API URLs.
+- No secrets in client-side bundles.
+- Consistent code formatting.
+- Meaningful variable names.
+- Clear comments for complex business logic.
+
+The application should be responsive on desktop, tablet and mobile.
+
+---
+
+# 21. IMPLEMENTATION ORDER
+
+Do not attempt to build all modules simultaneously without establishing their dependencies.
+
+Follow this exact sequence.
+
+## PHASE 0 — PROJECT INSPECTION AND ARCHITECTURE
+
+Before writing code:
+
+1. Inspect the existing repository.
+2. Identify the existing files.
+3. Check installed dependencies.
+4. Identify which modules already exist.
+5. Inspect existing environment configuration without exposing secret values.
+6. Check existing PostgreSQL schema.
+7. Identify missing functionality.
+8. Prepare a detailed implementation checklist.
+
+Do not overwrite working code without understanding it.
+
+Preserve the existing implementation wherever possible.
+
+## PHASE 1 — FRONTEND FOUNDATION
+
+Build:
+- Vite setup.
+- Tailwind setup.
+- Routing.
+- Global design system.
+- Navbar.
+- Footer.
+- Buttons.
+- Inputs.
+- Product cards.
+- Loading skeletons.
+- Toast system.
+- API client.
+- Authentication context.
+- Protected routes.
+
+## PHASE 2 — BACKEND FOUNDATION
+
+Build:
+- Express application.
+- Environment configuration.
+- PostgreSQL connection.
+- Database schema.
+- Authentication middleware.
+- Error middleware.
+- Validation.
+- API route structure.
+- Health endpoint.
+
+## PHASE 3 — CORE COMMERCE
+
+Complete:
+- Products.
+- Search.
+- OpenSearch integration.
+- Dealer comparison.
+- Cart.
+- Reservations.
+- Price-change retry.
+- Order placement.
+- Inventory finalisation.
+
+## PHASE 4 — EVENT-DRIVEN INTEGRATION
+
+Complete:
+- Transactional outbox.
+- Kafka producers.
+- Kafka consumers.
+- Idempotency.
+- Revision-based indexing.
+- Notification system.
+- Live-proof panel.
+
+## PHASE 5 — HYBRID FULFILMENT
+
+Complete:
+- PIN validation.
+- Quick mode.
+- Standard mode.
+- Transfer mode.
+- Mixed-cart grouping.
+- Fee allocation.
+- ETA ranges.
+- Transfer state machine.
+- OTP proofs.
+- Order tracking.
+
+## PHASE 6 — AFTER-SALES
+
+Complete:
+- Cancellation.
+- Stock restoration.
+- Refund ledger.
+- Simulated gateway credit.
+- Refund idempotency.
+
+## PHASE 7 — ADMIN AND OPTIONAL FEATURES
+
+Complete:
+- Admin dashboard.
+- Simulator.
+- Hub controls.
+- Optional modules only when mandatory tests pass.
+
+## PHASE 8 — FINAL TESTING
+
+Run:
+- Backend tests.
+- Frontend production build.
+- Integration tests.
+- Security scan.
+- Complete user journey tests.
+
+Fix all critical issues.
+
+---
+
+# 22. IMPORTANT DEVELOPMENT RULES
+
+Follow these rules throughout development.
+
+1. Do not build a static mockup.
+2. Do not use hardcoded product data in production UI.
+3. Do not use fake API responses to simulate a successful backend.
+4. Do not invent endpoints.
+5. Do not invent business rules.
+6. Do not change the approved schema casually.
+7. Do not replace Aiven services.
+8. Do not skip Kafka integration.
+9. Do not implement inventory changes through frontend state.
+10. Do not use raw OTP codes in Kafka or logs.
+11. Do not expose admin credentials.
+12. Do not claim simulated payments are real payments.
+13. Do not claim SAMPLE inventory is live inventory.
+14. Do not silently skip failed integration tests.
+15. Do not leave buttons non-functional.
+16. Do not leave forms disconnected from APIs.
+17. Do not use localStorage as a substitute for database persistence.
+18. Do not introduce additional features before the mandatory features work.
+19. Do not break existing functionality when adding new modules.
+20. Do not report an integration as complete until it has actually been verified.
+
+When an external service is not configured, build the proper integration code and provide an explicit setup requirement. Do not silently substitute a fake implementation.
+
+---
+
+# 23. FINAL ACCEPTANCE CRITERIA
+
+The project is complete only when the following user journey works:
+
+CUSTOMER JOURNEY:
+
+1. Customer opens BazaarBridge.
+2. Customer browses products.
+3. Customer searches for "bluetoth".
+4. Bluetooth products appear through typo-tolerant search.
+5. Customer filters by category, price and city.
+6. Customer opens a Bluetooth speaker.
+7. Customer compares five dealer offers.
+8. Five comparison categories return different winning dealers.
+9. Customer adds products to cart.
+10. Inventory is reserved.
+11. Customer enters a PIN code.
+12. The system identifies eligible delivery modes.
+13. Customer sees the appropriate delivery fees and ETA ranges.
+14. Customer places a mixed-cart order.
+15. The order creates independently trackable fulfilment groups.
+16. Kafka processes the order event.
+17. The inventory finalizer performs guarded stock deduction.
+18. The customer receives an order-confirmation notification.
+19. The customer can track fulfilment progress.
+20. The correct OTP completes delivery.
+21. A wrong OTP never completes delivery.
+22. An eligible order can be cancelled.
+23. Stock is restored exactly once.
+24. Refund ledger amounts are correctly credited exactly once by the simulated credit worker.
+
+ADMIN JOURNEY:
+
+1. Admin logs in separately.
+2. Admin opens the simulator.
+3. Admin views fulfilment groups.
+4. Admin advances order status.
+5. Admin handles transfers through distinct steps.
+6. Admin verifies OTP.
+7. Admin processes simulated refund credit.
+8. Admin pauses and resumes a hub.
+9. Admin views Kafka/outbox processing evidence.
+10. Admin can verify OpenSearch revision information.
+
+---
+
+# 24. DELIVERABLES
+
+At completion, provide:
+
+1. Complete React frontend.
+2. Complete Node.js and Express backend.
+3. PostgreSQL schema and migrations.
+4. Aiven PostgreSQL integration.
+5. Aiven Kafka integration.
+6. Aiven OpenSearch integration.
+7. Authentication and authorization.
+8. Functional customer storefront.
+9. Functional dealer comparison.
+10. Functional cart and reservations.
+11. Functional checkout.
+12. Functional hybrid fulfilment.
+13. Functional order tracking.
+14. Functional admin simulator.
+15. Cancellation and refund processing.
+16. Seed data scripts.
+17. Backend and integration tests.
+18. .env.example.
+19. .gitignore.
+20. Complete README.
+21. Setup instructions.
+22. API documentation.
+23. Deployment instructions.
+24. Built vs Simulated feature documentation.
+
+The README must explain how to configure Aiven PostgreSQL, Kafka and OpenSearch, install dependencies, run migrations, seed the database, start the backend, start the frontend and execute tests.
+
+Include the actual commands.
+
+---
+
+# 25. HOW YOU MUST WORK WITH ME
+
+I am developing this project using Google AI Studio.
+
+Work like an experienced technical co-founder, not like an AI that simply generates code and stops.
+
+First inspect the available project workspace.
+
+Then present:
+- Architecture assessment.
+- Existing functionality.
+- Missing functionality.
+- Implementation sequence.
+- External configuration required.
+
+After that, begin implementing the project.
+
+Do not stop after producing an architecture document or a list of recommendations.
+
+Write actual working files.
+
+After each major phase:
+
+1. Explain what you implemented.
+2. Identify the files created or modified.
+3. Run the relevant tests.
+4. Report what passed.
+5. Report what still requires external credentials or configuration.
+6. Continue to the next phase.
+
+If the task is too large for one generation cycle, divide it into manageable implementation stages and maintain a clear record of completed work.
+
+Never claim that a feature is complete merely because its UI exists.
+
+A feature is complete only when its frontend, backend, database and relevant integrations are connected and tested.
+
+If an external service cannot be reached, clearly report the limitation rather than fabricating success.
+
+## FINAL OBJECTIVE
+
+Deliver a visually outstanding, technically sound, responsive and genuinely functional BazaarBridge platform.
+
+The final result should look like a professionally developed e-commerce startup product and demonstrate real backend engineering, multi-dealer intelligence, reliable inventory management, event-driven architecture and hybrid fulfilment.
+
+**Build the core for real. Make the rest demo-ready.**
+
+Do not compromise the architecture, business rules, security or core functionality for visual shortcuts.
